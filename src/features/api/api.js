@@ -1,6 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import {useParams } from 'react-router-dom'
-
+import { createSelector } from "@reduxjs/toolkit"
 
 
 export const api = createApi({
@@ -10,32 +9,46 @@ export const api = createApi({
     endpoints: builder => ({
         getSkills: builder.query({
             query: () => '/skills',
-            transformResponse: responseData => {
-                return responseData;
-            },
-            providesTags: ['Skills']
+            // transformResponse: responseData => {
+            //     const loadedSkills = responseData.map(skill => {
+            //         if (!skill?.createdAt) skill.createdAt = new Date()
+            //         return skill;
+            //     });
+            //     return loadedSkills
+            // },
+            providesTags: ['Skills'],
+            // providesTags: (result, error, arg) => [
+            //     ...result.map(({ id }) => ({ type: 'Skills', id }))
+            // ]
         }),
-        getSelectedSkill: builder.query({
-            query: (id) => `/skills/${id}`,
-            transformResponse: responseData => {
-                return responseData;
-            },
-            providesTags: ['Skills']
+        addNewSkill: builder.mutation({
+            query: (newSkill) => ({
+                url: '/skills',
+                method: 'POST',
+                body: newSkill
+            }),
+            // invalidatesTags: [
+            //     { type: 'Skills'}
+            // ]
+            invalidatesTags: ['Skills'],
+        }),
+        deleteSkill: builder.mutation({
+           query: ({id}) => ({
+                url: '/skills',
+                method: 'DELETE',
+                body: {id}
+            }),
+            // invalidatesTags: (result, error, arg) => [
+            //     { type: 'Skills', id: arg.id }
+            // ]
+            invalidatesTags: ['Skills'],
         })
-        // addNewSkill: builder.mutation({
-        //     query: newSkill => ({
-        //         url: '/skills',
-        //         method: 'POST',
-        //         body: {
-        //             ...newSkill
-        //         }
-        //     }),
-        //     invalidatesTags: ['Skills']
-        // }),
     })
 })
-
 export const {
     useGetSkillsQuery,
-    useGetSelectedSkillQuery
+    useAddNewSkillMutation,
+    useDeleteSkillMutation
 } = api
+
+
